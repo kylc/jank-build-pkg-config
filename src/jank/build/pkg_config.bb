@@ -8,12 +8,12 @@
     (subs entry (count prefix))))
 
 (defn pkg-config
-  "Call the `pkg-config` tool and parse out link directories, include
-  directories, and link libraries."
+  "Call the `pkg-config` tool and parse link directories, include directories,
+  and link libraries."
   [pc-name]
   ;; TODO: parse preprocessor defines from cflags
   (let [pc-cmd    ["pkg-config" pc-name "--libs" "--cflags"]
-        pc-output (-> pc-cmd proc/sh proc/check :out)]
+        pc-output (->> pc-cmd (apply proc/shell {:out :string}) :out)]
     (doseq [link-dir (parse-prefixed "-L" pc-output)]
       (println (str "jank-build::link-dir=" link-dir)))
     (doseq [include-dir (parse-prefixed "-I" pc-output)]
